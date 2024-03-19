@@ -2,7 +2,19 @@ importScripts(
   'https://storage.googleapis.com/workbox-cdn/releases/6.2.0/workbox-window.prod.mjs'
 );
 
-workbox.routing.registerModule(
-  ({ request }) => request.destination === 'image',
-  new workbox.strategies.NetworkFirst()
-);
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  if (request.destination === 'document') {
+    return;
+  }
+
+  event.respondWith(fetch(request).catch(() => {}));
+});
